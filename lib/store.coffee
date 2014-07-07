@@ -1,5 +1,8 @@
 _knex = require 'knex'
 _database = null
+_fs = require 'fs'
+_path = require 'path'
+_async = require 'async'
 
 #创建字段
 createField = (table, schema)->
@@ -37,7 +40,7 @@ exports.scanSchema = (dir, cb)->
   #允许的扩展名
   allowExt = ['.coffee', '.json', '.jss']
 
-  files = _fs.readdirSync _path.join(__dirname, dir)
+  files = _fs.readdirSync dir
   _async.eachSeries(files, ((filename, done)->
       #只处理指定扩展名的文件
       return done null if not(_path.extname(filename) in allowExt)
