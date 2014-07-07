@@ -7,6 +7,20 @@ class BaseEntity
     @fields = _.keys(@schema.fields)
     @fields.push 'id'
 
+  #计算分页
+  pagination: (pageIndex, pageSize)->
+    pageIndex = parseInt(pageIndex)
+    pageIndex = 1 if isNaN(pageIndex)
+    pageSize = parseInt(pageSize)
+    pageSize = 10 if isNaN(pageSize)
+
+    return{
+      pageSize: pageSize
+      offset: pageIndex * pageSize - pageSize
+      limit: pageSize
+      pageIndex: pageIndex
+    }
+
   #返回字段列表
   getFields: (without)->
     params = [@fields].concat(without)
