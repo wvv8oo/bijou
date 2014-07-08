@@ -7,6 +7,9 @@ class BaseEntity
     @fields = _.keys(@schema.fields)
     @fields.push 'id'
 
+  #执行一条sql语句
+  execute: (sql, cb)-> @entity().knex.raw(sql).exec cb
+
   #计算分页
   pagination: (pageIndex, pageSize)->
     pageIndex = parseInt(pageIndex)
@@ -38,10 +41,11 @@ class BaseEntity
 
   #获取第一行第一列的数据
   scalar: (sql, cb)->
-    @entity().knex.raw(sql).then (result)->
+    @execute sql, (err, result)->
       cell = null
-      return cb err, cell if result[0].length is 0
+      return cb err, cell if err or result[0].length is 0
 
+      #取第一行第一列
       for key, value of result[0][0]
         cell = value
         break
