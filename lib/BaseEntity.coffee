@@ -2,6 +2,9 @@ _store = require './store'
 _async = require 'async'
 _ = require 'lodash'
 
+_log = (log)->
+  console.log log if process.env.DEBUG
+
 class BaseEntity
   constructor: (@schema)->
     @fields = _.keys(@schema.fields)
@@ -41,6 +44,7 @@ class BaseEntity
 
   #获取第一行第一列的数据
   scalar: (sql, cb)->
+    _log sql
     @execute sql, (err, result)->
       cell = null
       return cb err, cell if err or result[0].length is 0
@@ -65,7 +69,9 @@ class BaseEntity
     cond = id: id
 
 
-    @entity().where(cond).select(fields).exec (err, result)->
+    entity = @entity().where(cond).select(fields)
+    _log entity.toString()
+    entity.exec (err, result)->
       cb err, result && result[0]
 
   #只取一条数据
@@ -132,7 +138,7 @@ class BaseEntity
           entity.offset page.offset
 
         #sql = exec.toString()
-        #console.log entity.toString()
+        _log entity.toString()
 
         entity.exec (err, items)->
           return done err if err
@@ -155,27 +161,22 @@ class BaseEntity
   save: (data = {}, cb)->
     #过滤掉不可靠的数据
     data = @parse data
+    entity = @entity()
+    isUpdate = Boolean(data.id)
     #如果包含id，则插入
-    if not data.id
-      #检查schema中，是否包含timestamp，如果有，则替换为当前日期
-      #data.timestamp = Number(new Date()) if this.schema.fields.timestamp isnt undefined
-
-      this.entity()
-      .insert(data)
-      .exec (err, result)-> cb(err, result && result.length > 0 && result[0])
+    if isUpdate
+      entity.where('id', '=', data.id).update(data)
     else
-      #console.log data, cb
-      this.entity()
-      .where('id', '=', data.id)
-      .update(data)
-      .exec (err)-> cb err
+      entity.insert(data)
+
+    entity.exec (err, result)->
+      cb err, result && result.length > 0 && result[0]
 
   #根据Id删除数据
   removeById: (id, cb)-> @remove id: id, cb
 
   #简单的删除功能
   remove: (cond, cb)-> @entity().where(cond).del().exec cb
-
 
   #根据规则校验
   validate: (value, rule)->
