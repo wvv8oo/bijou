@@ -5,6 +5,7 @@ _ = require 'underscore'
 _httpStatus = require './httpStatus'
 _async = require 'async'
 _path = require 'path'
+_fs = require 'fs'
 
 _app = null
 _options = null
@@ -87,7 +88,9 @@ executeRoute = (special, action, biz, method, path, router)->
 #处理API的路由
 apiRouter = (router)->
   file = _path.resolve _path.dirname(require.main.filename), _options.biz
-  file = _path.join file, router.biz
+  file = _path.join file, router.biz || router.path   #如果没有显式指定biz，则直接取path作为biz文件名
+  return console.log "File not found -> #{file}".red if _fs.existsSync file
+
   biz = require file
   paths = getPaths(router)
 
