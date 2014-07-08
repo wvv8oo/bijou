@@ -1,8 +1,13 @@
+#封装http状态错误
 class HTTPStatusError
   constructor: (@status, @message, @code)->
   toJSON: ()-> message: @message, code: @code
 
+class NotAcceptableError extends HTTPStatusError
+  constructor: (@message, @code)-> super 406, @message, @code
+
 exports.HTTPStatusError = HTTPStatusError
+exports.NotAcceptableError = NotAcceptableError
 
 #响应错误
 exports.responseError = (err, res)->
