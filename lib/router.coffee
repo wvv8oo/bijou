@@ -2,7 +2,7 @@
   路由
 ###
 _ = require 'underscore'
-_error = require './Error'
+_httpStatus = require './httpStatus'
 _async = require 'async'
 _path = require 'path'
 
@@ -71,7 +71,7 @@ executeRoute = (special, action, biz, method, path, router)->
         return done null if not _options.requestPermission
         _options.requestPermission client, router, action, (err, allow)->
           #未经授权的错误
-          return done new _error.HTTPStatusError(401) if not allow
+          return done new _httpStatus.HTTPStatusError(401) if not allow
           done err
     )
 
@@ -81,7 +81,7 @@ executeRoute = (special, action, biz, method, path, router)->
 
       #标准的处理方法
       biz[method].call biz, client, (err, result)->
-        return _error.responseError err, res if err
+        return _httpStatus.responseError err, res if err
         responseJSON result, res, action
 
 #处理API的路由
