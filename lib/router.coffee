@@ -60,7 +60,7 @@ executeRoute = (special, action, biz, method, path, router)->
       (done)->
         #不需要处理
         return done null if not _options.onBeforeHandler
-        _options.onBeforeHandler client, req, (newClient)->
+        _options.onBeforeHandler client, req, (err, newClient)->
           client = newClient
           done null
     )
