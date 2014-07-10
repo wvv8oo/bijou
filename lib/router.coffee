@@ -44,7 +44,6 @@ getPaths = (router)->
 responseJSON = (result, res, action)->
   result = result || null
   res.json result
-  res.end()
 
 #处理某个具体的路由
 executeRoute = (special, action, biz, method, path, router)->
