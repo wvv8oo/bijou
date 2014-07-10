@@ -40,11 +40,6 @@ getPaths = (router)->
     paths[method] = path    #"/api/#{path}"
   paths
 
-#正常完所操作后响应数据
-responseJSON = (result, res, action)->
-  result = result || null
-  res.json result
-
 #处理某个具体的路由
 executeRoute = (special, action, biz, method, path, router)->
   _app[action] path, (req, res, next)->
@@ -76,13 +71,13 @@ executeRoute = (special, action, biz, method, path, router)->
     )
 
     _async.waterfall queue, (err)->
+      return _httpStatus.responseError err, res if err
       #特殊方法进行处理
       return biz[method].call biz, req, res, next, client if special
 
       #标准的处理方法
       biz[method].call biz, client, (err, result)->
-        return _httpStatus.responseError err, res if err
-        responseJSON result, res, action
+        _httpStatus.responseJSON err, result, res, action
 
 #处理API的路由
 apiRouter = (router)->
@@ -97,6 +92,8 @@ apiRouter = (router)->
     path = paths[action]
     #将要执行的方法
     method = (router.methods || {})[action]
+    #是否已经指定了method
+    isDefineMethod = Boolean(method)
     #只有在method被显式指定为false或者0的情况下，才忽略
     return if method in [false, 0]
 
@@ -108,8 +105,9 @@ apiRouter = (router)->
     method = RegExp.$1 if special = /^\{(.+)\}$/i.test(method)
 
     #业务处理找不到对应的方法
-    errMsg = "Handler not found: [#{biz} #{path} -> #{action}]".red
-    return console.log errMsg if not biz[method]
+    errMsg = "Handler not found: #{action}: #{path} -> #{biz}.#{method}"
+    return console.log(if isDefineMethod then errMsg.red else errMsg.yellow) if not biz[method]
+    console.log "#{action}: #{path} -> #{biz}.#{method}".green
 
     #业务逻辑直接接管路由
     executeRoute special, action, biz, method, path, router
