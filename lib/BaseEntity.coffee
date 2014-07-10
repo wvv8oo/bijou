@@ -11,7 +11,7 @@ class BaseEntity
     @fields.push 'id'
 
   #执行一条sql语句
-  execute: (sql, cb)-> @entity().knex.raw(sql).exec cb
+  execute: (sql, cb)-> @entity().knex.raw(sql).exec (err, result)-> cb err, result && result[0]
 
   #计算分页
   pagination: (pageIndex, pageSize)->
@@ -47,10 +47,10 @@ class BaseEntity
     _log sql
     @execute sql, (err, result)->
       cell = null
-      return cb err, cell if err or result[0].length is 0
+      return cb err, cell if err or not result or result.length is 0
 
       #取第一行第一列
-      for key, value of result[0][0]
+      for key, value of result[0]
         cell = value
         break
 
