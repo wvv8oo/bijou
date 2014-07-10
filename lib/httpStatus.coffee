@@ -15,10 +15,17 @@ exports.responseError = (err, res)->
     switch err.status
       when 406 then return this.notAcceptable err.toJSON(), res
       when 404 then return this.notFound res
+      when 401 then return this.unauthorized res
 
   #数据库错误
   res.statusCode = 500
   res.json err
+
+#正常完所操作后响应数据
+exports.responseJSON = (err, result, res, action)->
+  return @responseError err res if err
+  result = result || null
+  res.json result
 
 #向客户端响应404消息
 exports.notFound = (res)->
