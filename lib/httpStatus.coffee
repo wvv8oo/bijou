@@ -4,41 +4,50 @@ class HTTPStatusError
   toJSON: ()-> message: @message, code: @code
 
 class NotAcceptableError extends HTTPStatusError
-  constructor: (@message, @code)-> super 406, @message, @code
+  constructor: (@message = 'Not Acceptable', @code)-> super 406, @message, @code
+
+class NotFoundError extends HTTPStatusError
+  constructor: (@message = 'Not Found', @code)-> super 404, @message, @code
+
+class ForbiddenError extends HTTPStatusError
+  constructor: (@message = 'Forbidden', @code)-> super 403, @message, @code
+
+class UnauthorizedError extends HTTPStatusError
+  constructor: (@message = 'Unauthorized', @code)-> super 401, @message, @code
 
 exports.HTTPStatusError = HTTPStatusError
 exports.NotAcceptableError = NotAcceptableError
+exports.NotFoundError = NotFoundError
+exports.ForbiddenError = ForbiddenError
+exports.UnauthorizedError = UnauthorizedError
 
 #响应错误
 exports.responseError = (err, res)->
+  status = 500  #默认为500错误
+  message = err
   if err instanceof HTTPStatusError
     switch err.status
-      when 406 then return this.notAcceptable err.toJSON(), res
-      when 404 then return this.notFound res
-      when 401 then return this.unauthorized res
+      when 406 then return this.responseAcceptable err.toJSON(), res
+      else
+        status = err.status
+        message = err.message
 
-  #数据库错误
-  res.statusCode = 500
-  res.json err
+  res.statusCode = status
+  if(typeof message is 'object')
+    res.json message
+  else
+    res.end message || ''
 
 #正常完所操作后响应数据
 exports.responseJSON = (err, result, res, action)->
-  return @responseError err res if err
+  return @responseError err, res if err
   result = result || null
   res.json result
 
-#向客户端响应404消息
-exports.notFound = (res)->
-  res.statusCode = 404
-  res.end '404 Not Found'
-
-#响应未授权
-exports.unauthorized = (res)->
-  res.statusCode = 401
-  res.end '401 Unauthorized'
-
+exports.responseNotFound = (res)->
+  @responseError new NotFoundError(), res
 #响应数据格式不对
-exports.notAcceptable = (data, res)->
+exports.responseAcceptable = (data, res)->
   res.statusCode = 406
 
   if(typeof data is 'object')
