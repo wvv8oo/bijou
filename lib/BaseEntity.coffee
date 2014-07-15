@@ -83,6 +83,9 @@ class BaseEntity
     @find cond, options, (err, data)->
       cb err, data && data[0]
 
+  #计算页总数
+  pageCount: (pagination)-> Math.ceil(pagination.recordCount / pagination.pageSize)
+
   #简单的搜索
   find: (cond, options, cb)->
     if typeof options is 'function'
@@ -132,7 +135,7 @@ class BaseEntity
           page.recordCount = count
           page.pageSize = page.pageSize || 10
           page.pageIndex = page.pageIndex || 1
-          page.pageCount = Math.ceil(count / page.pageSize)
+          page.pageCount = self.pageCount page
 
           entity.limit page.limit
           entity.offset page.offset
