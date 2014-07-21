@@ -3,23 +3,11 @@ class HTTPStatusError
   constructor: (@status, @message, @code)->
   toJSON: ()-> message: @message, code: @code
 
-class NotAcceptableError extends HTTPStatusError
-  constructor: (@message = 'Not Acceptable', @code)-> super 406, @message, @code
-
-class NotFoundError extends HTTPStatusError
-  constructor: (@message = 'Not Found', @code)-> super 404, @message, @code
-
-class ForbiddenError extends HTTPStatusError
-  constructor: (@message = 'Forbidden', @code)-> super 403, @message, @code
-
-class UnauthorizedError extends HTTPStatusError
-  constructor: (@message = 'Unauthorized', @code)-> super 401, @message, @code
-
-exports.HTTPStatusError = HTTPStatusError
-exports.NotAcceptableError = NotAcceptableError
-exports.NotFoundError = NotFoundError
-exports.ForbiddenError = ForbiddenError
-exports.UnauthorizedError = UnauthorizedError
+exports.httpStatusError = (status, message, code)-> new HTTPStatusError status, message, code
+exports.notAcceptableError = (message)-> new HTTPStatusError 406, message
+exports.notFoundError = (message)-> new HTTPStatusError 404, message
+exports.forbiddenError = (message)-> new HTTPStatusError 403, message
+exports.unauthorizedError = (message)-> new HTTPStatusError 401, message
 
 #响应错误
 exports.responseError = (err, res)->

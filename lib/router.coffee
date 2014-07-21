@@ -2,7 +2,7 @@
   路由
 ###
 _ = require 'underscore'
-_httpStatus = require './httpStatus'
+_http = require './http'
 _async = require 'async'
 _path = require 'path'
 _fs = require 'fs'
@@ -11,6 +11,10 @@ _app = null
 _options = null
 require 'colors'
 ACTIONS = ["post", "get", "put", "delete", "patch"]
+
+_log = (message)->
+  return if not _options.log
+  console.log message
 
 #anonymity
 #获取crud的默认paths
@@ -66,24 +70,24 @@ executeRoute = (special, action, biz, method, path, router)->
         return done null if not _options.requestPermission
         _options.requestPermission client, router, action, (err, allow)->
           #未经授权的错误
-          return done new _httpStatus.HTTPStatusError(401) if not allow
+          return done new _http.ForbiddenError() if not allow
           done err
     )
 
     _async.waterfall queue, (err)->
-      return _httpStatus.responseError err, res if err
+      return _http.responseError err, res if err
       #特殊方法进行处理
       return biz[method].call biz, req, res, next, client if special
 
       #标准的处理方法
       biz[method].call biz, client, (err, result)->
-        _httpStatus.responseJSON err, result, res, action
+        _http.responseJSON err, result, res, action
 
 #处理API的路由
 apiRouter = (router)->
   file = _path.resolve _path.dirname(require.main.filename), _options.biz
   file = _path.join file, router.biz || router.path   #如果没有显式指定biz，则直接取path作为biz文件名
-  return console.log "File not found -> #{file}".red if _fs.existsSync file
+  return _log "File not found -> #{file}".red if _fs.existsSync file
 
   biz = require file
   paths = getPaths(router)
@@ -106,8 +110,8 @@ apiRouter = (router)->
 
     #业务处理找不到对应的方法
     errMsg = "Handler not found: #{action}: #{path} -> #{biz}.#{method}"
-    return console.log(if isDefineMethod then errMsg.red else errMsg.yellow) if not biz[method]
-    console.log "#{action}: #{path} -> #{biz}.#{method}".green
+    return _log(if isDefineMethod then errMsg.red else errMsg.yellow) if not biz[method]
+    _log "#{action}: #{path} -> #{biz}.#{method}".green
 
     #业务逻辑直接接管路由
     executeRoute special, action, biz, method, path, router

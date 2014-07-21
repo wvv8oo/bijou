@@ -10,4 +10,4 @@ exports.initalize = (app, options)->
 exports.BaseEntity = _BaseEntity
 exports.createTable = _store.createTable
 exports.scanSchema = _store.scanSchema
-exports.httpStatus = require './httpStatus'
+exports.http = require './http'
