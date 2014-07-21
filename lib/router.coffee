@@ -70,7 +70,7 @@ executeRoute = (special, action, biz, method, path, router)->
         return done null if not _options.requestPermission
         _options.requestPermission client, router, action, (err, allow)->
           #未经授权的错误
-          return done new _http.ForbiddenError() if not allow
+          return done new _http.forbiddenError() if not allow
           done err
     )
 
