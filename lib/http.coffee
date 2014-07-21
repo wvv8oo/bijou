@@ -33,7 +33,7 @@ exports.responseJSON = (err, result, res, action)->
   res.json result
 
 exports.responseNotFound = (res)->
-  @responseError new NotFoundError(), res
+  @responseError exports.notFoundError(), res
 #响应数据格式不对
 exports.responseAcceptable = (data, res)->
   res.statusCode = 406
