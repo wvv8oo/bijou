@@ -10,8 +10,12 @@ class BaseEntity
     @fields = _.keys(@schema.fields)
     @fields.push 'id'
 
+  raw: (sql)->
+    _store.database().raw(sql)
   #执行一条sql语句
-  execute: (sql, cb)-> @entity().knex.raw(sql).exec (err, result)-> cb err, result && result[0]
+  execute: (sql, cb)->
+#    console.log sql, cb
+    @raw(sql).exec (err, result)-> cb err, result && result[0]
 
   #计算分页
   pagination: (pageIndex, pageSize)->
