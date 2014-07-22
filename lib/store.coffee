@@ -49,7 +49,7 @@ exports.scanSchema = (dir, cb)->
 
       return console.log "#{filename}不是一个合法的schema文件" if not (schema and schema.name and schema.fields)
 
-      console.log "创建表：#{schema.name}"
+      #console.log "创建表：#{schema.name}"
       #建表
       exports.createTable schema, done
     ), cb
