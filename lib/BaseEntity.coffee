@@ -177,7 +177,8 @@ class BaseEntity
       entity.insert(data)
 
     entity.exec (err, result)->
-      cb err, result && result.length > 0 && result[0]
+      return cb err if err
+      cb err, if isUpdate then result else result[0]
 
   #根据Id删除数据
   removeById: (id, cb)-> @remove id: id, cb
