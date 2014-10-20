@@ -160,9 +160,13 @@ class BaseEntity
     _async.waterfall queue, cb
 
   #根据id更新数据
-  updateById: (id, data, cb)->
-    data.id = id
-    @save data, cb
+  updateById: (id, data, cb)-> @update id: id, data, cb
+
+  #根据条件更新数据
+  update: (cond, data, cb)->
+    data = @parse data
+    entity = @entity()
+    entity.where(cond).update(data).exec (err)-> cb err
 
   #简单的存储
   save: (data = {}, cb)->
