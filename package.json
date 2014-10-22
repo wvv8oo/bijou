@@ -1,6 +1,6 @@
 {
     "name": "bijou",
-    "version": "0.0.4",
+    "version": "0.0.6",
     "main": "./lib/index.coffee",
     "dependencies": {
         "async": "^0.9.0",

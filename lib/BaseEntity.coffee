@@ -7,8 +7,12 @@ _log = (log)->
 
 class BaseEntity
   constructor: (@schema)->
-    @fields = _.keys(@schema.fields)
-    @fields.push 'id'
+    #允许没有schema，则
+    if @schema
+      @fields = _.keys(@schema.fields)
+      @fields.push 'id'
+    else
+      @fields = []
 
   raw: (sql)->
     _store.database().raw(sql)
@@ -62,7 +66,7 @@ class BaseEntity
 
   #获取当前的实体
   entity: (withAlias)->
-    name = "#{@schema.name}#{if withAlias then ' AS A' else ''}"
+    name = "#{@schema?.name}#{if withAlias then ' AS A' else ''}"
     return _store.database()(name)
 
   #根据id查找一条数据
