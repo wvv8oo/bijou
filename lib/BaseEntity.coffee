@@ -41,8 +41,45 @@ class BaseEntity
     _.without.apply _, params
 
   #根据条件，检查数据是否存在
-  exists: (cond, cb)->
-    @count cond, (err, count)-> cb err, not err and count > 0
+  ###
+    调用方式
+    1. exists(cond, cb)
+    2. exists(matches, cond, cb)
+    适用于更新时，查询某字段是否存在。如下面的代码表示，在project_id=1的数据中，查询title='标题'，但不包括id为1的数据
+    exists({title: '标题'}, {project_id: 1}, {id: 1}, cb)
+    3. exists(matches, cond, notMatches, cb)
+  ###
+
+  exists: (args...)->
+    #只有两个参数，第一个参数
+    if args.length is 2 and typeof args[1] is 'function'
+      cond = args[0]
+      cb = args[1]
+      return @count cond, (err, count)-> cb err, not err and count > 0
+
+    #提供多个参数的，包括matches
+    matches = args[0]
+    cond = args[1]
+
+    if typeof args[2] is 'function'
+      cb = args[2]
+      notMatches = undefined
+    else
+      cb = args[3]
+      notMatches = args[2]
+
+    entity = @entity()
+    entity.select entity.knex.raw('COUNT(*)')
+    entity.where(cond)
+    entity.where(->
+      this.orWhere(key, value) for key, value of matches
+    )
+
+    #如果是更新，则不能是当前id的数据
+    notMatches = notMatches || {}
+    entity.where(key, '<>', value) for key, value of notMatches
+
+    @scalar entity.toString(), (err, total)-> cb err, total > 0
 
   #根据条件汇总
   count: (cond, cb)->
