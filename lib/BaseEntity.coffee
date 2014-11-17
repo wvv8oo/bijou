@@ -231,6 +231,8 @@ class BaseEntity
   #简单的删除功能
   remove: (cond, cb)-> @entity().where(cond).del().exec cb
 
+  insert: (datas, cb)-> @entity().insert(datas).exec cb
+
   #根据规则校验
   validate: (value, rule)->
     rule = {type: rule} if typeof rule is 'string'
