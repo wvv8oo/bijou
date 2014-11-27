@@ -23,7 +23,7 @@ getPaths = (router)->
   pathSuffix =
     post: ""
     get: "/:id(\\d+)?"
-    put: "/:id(\\d+)"
+    put: "/:id(\\d+)?"
     delete: "/:id(\\d+)"
     patch: '/:id(\\d+)'
 
