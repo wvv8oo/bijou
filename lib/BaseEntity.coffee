@@ -204,10 +204,17 @@ class BaseEntity
   updateById: (id, data, cb)-> @update id: id, data, cb
 
   #根据条件更新数据
-  update: (cond, data, cb)->
+  update: (cond, data, options, cb)->
+    if typeof options is 'function'
+      cb = options
+      options = {}
+
+    cond = cond || {}
+
     data = @parse data
-    entity = @entity()
-    entity.where(cond).update(data).exec (err)-> cb err
+    entity = @entity().where(cond)
+    options.beforeQuery?(entity)
+    entity.update(data).exec (err)-> cb err
 
   #简单的存储
   save: (data = {}, cb)->
