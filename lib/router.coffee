@@ -23,7 +23,7 @@ getPaths = (router)->
   pathSuffix =
     post: ""
     get: "/:id(\\d+)?"
-    put: "/:id(\\d+)"
+    put: "/:id(\\d+)?"
     delete: "/:id(\\d+)"
     patch: '/:id(\\d+)'
 
@@ -51,6 +51,7 @@ executeRoute = (special, action, biz, method, path, router)->
       params: req.params
       body: req.body
       query: req.query
+      router: router
 
     queue = []
     #处理前
