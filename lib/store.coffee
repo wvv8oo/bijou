@@ -16,6 +16,7 @@ createField = (table, schema)->
       #处理对象字面量
       field = table[property.type || 'string'] key
       field.index() if property.index
+      field.defaultTo(property.default) if property.default isnt undefined
 
 
 exports.database = ()->
