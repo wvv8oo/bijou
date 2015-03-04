@@ -29,7 +29,7 @@ exports.responseError = (err, res)->
 #正常完所操作后响应数据
 exports.responseJSON = (err, result, res, action)->
   return @responseError err, res if err
-  result = result || null
+  result = result || {}
   res.json result
 
 exports.responseNotFound = (res)->
