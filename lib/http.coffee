@@ -1,7 +1,12 @@
 #封装http状态错误
 class HTTPStatusError
   constructor: (@status, @message, @code)->
-  toJSON: ()-> message: @message, code: @code
+  toJSON: ()->
+    return {
+      message: @message
+      code: @code
+      status: @status
+    }
 
 exports.httpStatusError = (status, message, code)-> new HTTPStatusError status, message, code
 exports.notAcceptableError = (message)-> new HTTPStatusError 406, message
