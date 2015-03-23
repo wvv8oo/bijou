@@ -8,6 +8,8 @@ class HTTPStatusError
       status: @status
     }
 
+#暴露HTTPStatusError这个类
+exports.HTTPStatusError = HTTPStatusError
 exports.httpStatusError = (status, message, code)-> new HTTPStatusError status, message, code
 exports.notAcceptableError = (message)-> new HTTPStatusError 406, message
 exports.notFoundError = (message)-> new HTTPStatusError 404, message
