@@ -1,5 +1,5 @@
 _path = require("path")
-_bijou = require("../lib")
+_bijou = require("../src")
 _config = require './config'
 
 #获取用户的基本信息

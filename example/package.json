@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "node app.js"
+    "start": "node-dev app.coffee"
   },
   "dependencies": {
     "colors": "^0.6.2",

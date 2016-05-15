@@ -1,4 +1,4 @@
-_BaseEntity = require('../../lib').BaseEntity
+_BaseEntity = require('../../src').BaseEntity
 
 class Todo extends _BaseEntity
   constructor: ->
