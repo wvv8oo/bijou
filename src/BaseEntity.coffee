@@ -1,6 +1,7 @@
 _store = require './store'
 _async = require 'async'
 _ = require 'lodash'
+_knex = require 'knex'
 
 _log = (log)->
   console.log log if process.env.DEBUG
@@ -14,12 +15,12 @@ class BaseEntity
     else
       @fields = []
 
-  raw: (sql)->
-    _store.database().raw(sql)
+  raw: (sql)-> _store.database().raw(sql)
+
   #执行一条sql语句
   execute: (sql, cb)->
 #    console.log sql, cb
-    @raw(sql).exec (err, result)-> cb err, result && result[0]
+    @raw(sql).asCallback (err, result)-> cb err, result && result[0]
 
   #计算分页
   pagination: (pageIndex, pageSize)->
@@ -69,7 +70,7 @@ class BaseEntity
       notMatches = args[2]
 
     entity = @entity()
-    entity.select entity.knex.raw('COUNT(*)')
+    entity.select _knex.raw('COUNT(*)')
     entity.where(cond)
     entity.where(->
       this.orWhere(key, value) for key, value of matches
@@ -84,7 +85,7 @@ class BaseEntity
   #根据条件汇总
   count: (cond, cb)->
     query = @entity().where cond
-    query.select query.knex.raw('COUNT(*)')
+    query.select _knex.raw('COUNT(*)')
     @scalar query.toString(), cb
 
   #获取第一行第一列的数据
@@ -116,7 +117,7 @@ class BaseEntity
 
     entity = @entity().where(cond).select(fields)
     _log entity.toString()
-    entity.exec (err, result)->
+    entity.asCallback (err, result)->
       cb err, result && result[0]
 
   #只取一条数据
@@ -152,7 +153,7 @@ class BaseEntity
 
         exec = self.entity(true).where cond
         options.beforeQuery?(exec, true)
-        exec.select exec.knex.raw('count(*)')
+        exec.select _knex.raw('count(*)')
 
         #汇总统计
         self.scalar exec.toString(), (err, count)-> done null, count
@@ -188,7 +189,7 @@ class BaseEntity
         #sql = exec.toString()
         _log entity.toString()
 
-        entity.exec (err, items)->
+        entity.asCallback (err, items)->
           return done err if err
           return done err, items if not options.pagination
 
@@ -214,7 +215,7 @@ class BaseEntity
     data = @parse data
     entity = @entity().where(cond)
     options.beforeQuery?(entity)
-    entity.update(data).exec (err)-> cb err
+    entity.update(data).asCallback (err)-> cb err
 
   #简单的存储
   save: (data = {}, cb)->
@@ -228,7 +229,7 @@ class BaseEntity
     else
       entity.insert(data)
 
-    entity.exec (err, result)->
+    entity.asCallback (err, result)->
       return cb err if err
       cb err, if isUpdate then result else result[0]
 
@@ -236,9 +237,9 @@ class BaseEntity
   removeById: (id, cb)-> @remove id: id, cb
 
   #简单的删除功能
-  remove: (cond, cb)-> @entity().where(cond).del().exec cb
+  remove: (cond, cb)-> @entity().where(cond).del().asCallback cb
 
-  insert: (datas, cb)-> @entity().insert(datas).exec cb
+  insert: (datas, cb)-> @entity().insert(datas).asCallback cb
 
   #根据规则校验
   validate: (value, rule)->
