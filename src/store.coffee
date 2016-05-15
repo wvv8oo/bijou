@@ -24,7 +24,7 @@ exports.database = ()->
   _database
 
 exports.initalize = (options)->
-  _database = _knex.initialize options
+  _database = _knex options
 
 #创建一个表
 exports.createTable = (schema, cb)->
