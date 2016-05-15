@@ -1,7 +1,7 @@
 ###
   路由
 ###
-_ = require 'underscore'
+_ = require 'lodash'
 _http = require './http'
 _async = require 'async'
 _path = require 'path'
